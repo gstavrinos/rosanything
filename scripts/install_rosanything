@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+import os
+import sys
+import rospkg
+from os.path import expanduser
+
+
+if __name__ == '__main__':
+    if len(sys.argv) >= 2:
+        rospack = rospkg.RosPack()
+        path = rospack.get_path("rosanything")
+        forbidden_commands = ["cd", "pd", "ls", "make", "clean", "run", "ed", "cp", "cat", "launch", "test", "pack", "bag", "node", "param", "topic", "service", "msg", "srv", "create-pkg", "wtf", "console"]
+        args = sys.argv[1:]
+        filename = "rosanything"
+        i = 1
+        once = True
+        while(os.path.isfile(path+"/bash/"+filename)):
+            filename = "rosanything"+str(i)
+            i += 1
+        with open(path+"/bash/"+filename, "w") as f:
+            for arg in args:
+                if not arg in  forbidden_commands:
+                    if once:
+                        f.write("#!/bin/bash\n")
+                        once = False
+                    f.write("function ros"+arg+" {\n\
+    local arg\n\
+    _roscmd ${1} ${2}\n\
+    "+arg+" ${arg}\n\
+}\n\
+complete -F \"_roscomplete_file\" \"ros"+arg+"\"\n\n\
+"
+)
+                else:
+                    print arg + " is already a command included in rosbash. Ignoring..."
+        if not once: # I created at least one valid command
+            with(open(expanduser("~")+"/.bashrc", "a")) as f:
+                f.write("\nsource "+path+"/bash/"+filename+"\n")
+        print "Finished installation."
+    else:
+        print "install_rosanything takes at least one argument."
+    print "Exiting..."
