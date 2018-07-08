@@ -1,7 +1,7 @@
 # ROSANYTHING!
 
 
-Create custom commands that use autocmplete of ROS messages with ease!
+Create custom commands that use autocomplete of ROS messages with ease!
 
 :warning: WARNING:
 ---
